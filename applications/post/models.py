@@ -8,6 +8,7 @@ class Post(models.Model):
     description = models.TextField('Описание поста')
     owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='posts', verbose_name='Владелец поста')
     created_at = models.DateTimeField(auto_now_add=True, verbose_name='Дата создания')
+    image = models.ImageField(upload_to='images', null=True, blank=True)
 
     def __str__(self) -> str:
         return self.title

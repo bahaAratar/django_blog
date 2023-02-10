@@ -6,6 +6,12 @@ from applications.post.serializers import PostSerializer
 from applications.post.permissions import IsOwner
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import SearchFilter, OrderingFilter
+from rest_framework.pagination import PageNumberPagination
+
+class CustomPagination(PageNumberPagination):
+    page_size = 3
+    page_size_query_param = 'page_size'
+    max_page_size = 10000
 
 
 # class PostListAPIView(generics.ListAPIView):
@@ -33,6 +39,8 @@ class PostListCreateAPIView(generics.ListCreateAPIView):
 
     queryset = Post.objects.all()
     serializer_class = PostSerializer
+
+    pagination_class = CustomPagination
     
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
     filterset_fields = ['owner', 'title']
@@ -48,8 +56,12 @@ class PostListCreateAPIView(generics.ListCreateAPIView):
 
     #     return queryset
 
+    def perform_create(self, serializer):
+        serializer.save(owner=self.request.user)
+
 class PostDetailDeleteUpdataAPIView(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = [IsOwner]
 
     queryset = Post.objects.all()
     serializer_class = PostSerializer
+
